@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mood Board — Tumbleweed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      background: #0a0a0a;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    nav .brand {
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+
+    nav .title {
+      font-size: 14px;
+      font-weight: 300;
+      color: #fff;
+      letter-spacing: 0.04em;
+      opacity: 0.85;
+    }
+
+    /* Grid */
+    main {
+      padding: 80px 24px 48px;
+    }
+
+    .grid {
+      columns: 3;
+      column-gap: 12px;
+    }
+
+    .card {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: #FF520E;
+    }
+
+    .card video {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+
+    /* Lightbox */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #lightbox.active {
+      display: flex;
+    }
+
+    #lightbox video {
+      max-width: 100%;
+      max-height: 100vh;
+      display: block;
+    }
+
+    #lb-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 28px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      line-height: 1;
+      z-index: 10;
+    }
+
+    #lb-close:hover { opacity: 1; }
+
+    #lb-prev, #lb-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 36px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+      padding: 16px;
+      z-index: 10;
+      line-height: 1;
+    }
+
+    #lb-prev { left: 16px; }
+    #lb-next { right: 16px; }
+    #lb-prev:hover, #lb-next:hover { opacity: 1; }
+
+    #lb-counter {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      font-weight: 300;
+      color: #fff;
+      opacity: 0.5;
+      letter-spacing: 0.1em;
+    }
+
+    #lb-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    #lb-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .grid { columns: 2; }
+      nav { padding: 14px 20px; }
+      nav .title { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .grid { columns: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">JMStudio</span>
+  <span class="title">Mood Board — Tumbleweed</span>
+</nav>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div id="lightbox">
+  <div id="lb-bg"></div>
+  <button id="lb-close">&#10005;</button>
+  <button id="lb-prev">&#8592;</button>
+  <div id="lb-content">
+    <video id="lb-video" controls playsinline></video>
+  </div>
+  <button id="lb-next">&#8594;</button>
+  <div id="lb-counter"></div>
+</div>
+
+<script>
+  const videos = [
+    "20250515_DJrqngTt50Q.mp4",
+    "SaveClip.App_AQMidlR_1blhwidvY3B5zKywqarDHwEq_0o8wwtJ5MH3n_ieJXgzwP0iWvEjc62nZlqTKLHl5jMu3hVLg0cAJpJev7rveSglIwHh5U.mp4",
+    "SaveClip.App_AQMPJSpgDTcg995GVQyvVPT6lZJf3A0_-JltyMv3blFRip7muvKE-EngBcMCjTIyZQ4YxFKt_iQPjPAGfzMYYbWcw78-sxiOO4XZjpl.mp4",
+    "SaveClip.App_AQMTmTiNQWjLFryGLefDXFoOSidxwSOqdnnG0V4jS87uO68dLSgFVYVHPT88moS_fCX7_qprOkg2NXT1EULaTIV-2-NnCey5x7PPrLg.mp4",
+    "SaveClip.App_AQMWOK1mJqf6nJtoKU511RxuFtvgxTYQBKALwxaYO7O-1KZuY2PgFrn3JgihS8mfwN_zSzerlPtWAJ_1x2TfJY3g93OpB84-ntjvGag.mp4",
+    "SaveClip.App_AQNgGwdT26PKwZBZLc_hS3aLwlnnjwoqMWhXhyar0kxrRH_ppNRg_x5CEKT9mSygwgAR8H3X8hhgppXYn6jxzz0GDSY0NlVZnwr8zfA.mp4",
+    "SaveClip.App_AQOD0Ri735YIl98os7Sij4NmCvSPf98mds24zyFjjVQeXxTO2OgMyiGbDwK3U9DO6su8VHRdr-K-l09cRCykPPiuNxQk0BUDdAWuSTM.mp4",
+    "SaveClip.App_AQOf42tERpC6qXALKjFOWEeooU5rsrQlLg7giXTjolSdfCk1Ho1rw-WM2AmmQKUP_Z6sJWMiGBQOifK5D71aBxfgXl4UeWfaQq1oPis.mp4",
+    "SaveClip.App_AQP7zeNrc89wJUgul2G9VynacJoHAelAshlPXtwQtNCTYNNmKQAPoYVZkljAusXk2XZ3b9AP3m9sWAW4bw_3KaQmoUyVmA6kx-UFfmk.mp4",
+    "SaveClip.App_AQPfuA-nOoBqyg292C9hO8cFsT1SDDbvruKmXk_khzhKpUFocG-rNowh28w2yy-y-Rc7_lWuaJeD_srNyC_7A5PdQLezOWaNOAry_Hg.mp4",
+    "SaveClip.App_AQPx7Eequ-iUWrHaSwKoep1NFzFMpHeC5lEOOL5yLehfWz35Y0V1YttfYx9kpHZGnKMTG3jQlezd_FYlLNT6Z3XO3upatGpsS7ispDs.mp4"
+  ];
+
+  let current = 0;
+  const grid = document.getElementById('grid');
+  const lightbox = document.getElementById('lightbox');
+  const lbVideo = document.getElementById('lb-video');
+  const lbCounter = document.getElementById('lb-counter');
+  const lbBg = document.getElementById('lb-bg');
+
+  // Build grid
+  videos.forEach((src, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const vid = document.createElement('video');
+    vid.src = src;
+    vid.preload = 'metadata';
+    vid.muted = true;
+    vid.playsInline = true;
+    card.appendChild(vid);
+    card.addEventListener('click', () => openLightbox(i));
+    grid.appendChild(card);
+  });
+
+  function openLightbox(index) {
+    current = index;
+    loadLightboxVideo();
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    lbVideo.pause();
+    lbVideo.src = '';
+    document.body.style.overflow = '';
+  }
+
+  function loadLightboxVideo() {
+    lbVideo.src = videos[current];
+    lbVideo.load();
+    lbVideo.play().catch(() => {});
+    lbCounter.textContent = `${current + 1} / ${videos.length}`;
+  }
+
+  document.getElementById('lb-close').addEventListener('click', closeLightbox);
+
+  lbBg.addEventListener('click', closeLightbox);
+
+  document.getElementById('lb-prev').addEventListener('click', (e) => {
+    e.stopPropagation();
+    current = (current - 1 + videos.length) % videos.length;
+    loadLightboxVideo();
+  });
+
+  document.getElementById('lb-next').addEventListener('click', (e) => {
+    e.stopPropagation();
+    current = (current + 1) % videos.length;
+    loadLightboxVideo();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') {
+      current = (current - 1 + videos.length) % videos.length;
+      loadLightboxVideo();
+    }
+    if (e.key === 'ArrowRight') {
+      current = (current + 1) % videos.length;
+      loadLightboxVideo();
+    }
+  });
+</script>
+
+</body>
+</html>
