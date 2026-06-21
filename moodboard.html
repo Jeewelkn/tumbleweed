@@ -96,8 +96,9 @@
     .video-grid {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      background: #ffffff;
     }
 
     .vid-card {
@@ -114,7 +115,8 @@
     .vid-card video {
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
       pointer-events: none;
     }
 
@@ -459,11 +461,34 @@
   const lbCounter = document.getElementById('lb-counter');
   const lbBg = document.getElementById('lb-bg');
 
-  document.querySelectorAll('.video-grid').forEach(grid => {
+  // Mosaic patterns per section: [gridColumn, heightPx]
+  const mosaicPatterns = [
+    // Section 1 — Café & Coffee Shop
+    [
+      ['1/3', 360], ['3/4', 360],
+      ['1/2', 420], ['2/3', 420], ['3/4', 420],
+      ['1/4', 180],
+    ],
+    // Section 2 — Restaurant & Food (mirror)
+    [
+      ['1/2', 360], ['2/4', 360],
+      ['1/2', 420], ['2/3', 420], ['3/4', 420],
+      ['1/4', 180],
+    ],
+  ];
+
+  document.querySelectorAll('.video-grid').forEach((grid, sectionIndex) => {
     const indices = grid.dataset.videos.split(',').map(Number);
-    indices.forEach(i => {
+    const pat = mosaicPatterns[sectionIndex] || [];
+    indices.forEach((i, pos) => {
       const card = document.createElement('div');
       card.className = 'vid-card';
+      if (pos < pat.length) {
+        card.style.gridColumn = pat[pos][0];
+        card.style.height = pat[pos][1] + 'px';
+      } else {
+        card.style.height = '280px';
+      }
       const vid = document.createElement('video');
       vid.src = videos[i];
       vid.preload = 'metadata';
