@@ -94,13 +94,15 @@
     }
 
     .video-grid {
-      position: relative;
-      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      background: #000;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
     .vid-card {
-      position: absolute;
       cursor: pointer;
       overflow: hidden;
       border-radius: 0;
@@ -114,7 +116,7 @@
     .vid-card video {
       display: block;
       width: 100%;
-      height: 100%;
+      aspect-ratio: 16/9;
       object-fit: cover;
       pointer-events: none;
     }
@@ -428,73 +430,16 @@
   const lbCounter = document.getElementById('lb-counter');
   const lbBg = document.getElementById('lb-bg');
 
-  // Collage layouts per section: [top, left, width, height, zIndex] in px
-  const collageLayouts = [
-    // Section 1 — Café & Coffee Shop (videos 1–11, height: 1400px)
-    [
-      [80,  120, 380, 240, 2],
-      [0,   560, 260, 180, 1],
-      [40,  820, 220, 300, 3],
-      [260, 0,   300, 200, 4],
-      [280, 280, 220, 260, 2],
-      [200, 480, 400, 220, 3],
-      [360, 740, 280, 200, 5],
-      [500, 60,  420, 240, 3],
-      [460, 440, 240, 300, 4],
-      [520, 660, 360, 220, 2],
-      [740, 160, 500, 260, 5],
-    ],
-    // Section 2 — Restaurant & Food (videos 12–33, height: 1740px)
-    [
-      [60,   80,   360, 220, 2],
-      [0,    520,  280, 200, 1],
-      [40,   900,  300, 260, 3],
-      [240,  20,   240, 280, 4],
-      [260,  280,  400, 220, 2],
-      [200,  740,  260, 200, 5],
-      [220,  1060, 200, 260, 3],
-      [500,  0,    320, 240, 4],
-      [480,  360,  260, 200, 3],
-      [460,  660,  420, 260, 2],
-      [900,  60,   340, 220, 5],
-      [860,  800,  420, 260, 4],
-      [1000, 380,  260, 300, 6],
-      [1140, 0,    280, 200, 3],
-      [1100, 620,  380, 240, 5],
-      [1080, 1050, 300, 260, 4],
-      [1320, 140,  420, 240, 6],
-      [1280, 520,  260, 280, 3],
-      [1340, 860,  360, 220, 5],
-      [1540, 0,    300, 260, 4],
-      [1500, 400,  440, 240, 6],
-      [1560, 980,  280, 220, 3],
-    ],
-  ];
-
-  const collageHeights = [1400, 1820];
-  const collageMaxWidths = [1100, 1400];
-
-  document.querySelectorAll('.video-grid').forEach((grid, sectionIndex) => {
-    grid.style.height = (collageHeights[sectionIndex] || 800) + 'px';
-    grid.style.maxWidth = (collageMaxWidths[sectionIndex] || 1100) + 'px';
+  document.querySelectorAll('.video-grid').forEach((grid) => {
     const indices = grid.dataset.videos.split(',').map(Number);
-    const layout = collageLayouts[sectionIndex] || [];
-    indices.forEach((i, pos) => {
-      if (pos >= layout.length) return;
-      const [top, left, width, height, zIndex] = layout[pos];
+    indices.forEach((i) => {
       const card = document.createElement('div');
       card.className = 'vid-card';
-      card.style.top = top + 'px';
-      card.style.left = left + 'px';
-      card.style.width = width + 'px';
-      card.style.height = height + 'px';
-      card.style.zIndex = zIndex;
       const vid = document.createElement('video');
       vid.src = videos[i];
       vid.preload = 'metadata';
       vid.muted = true;
       vid.playsInline = true;
-      vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
       card.appendChild(vid);
       card.addEventListener('click', () => openLightbox(i));
       grid.appendChild(card);
