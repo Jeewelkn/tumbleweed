@@ -355,7 +355,9 @@
       const card = document.createElement('div');
       card.className = 'vid-card';
       const vid = document.createElement('video');
-      vid.src = videos[i] + '#t=0.5';
+      const seek = i === 10 ? 3 : 0.5;
+      vid.src = videos[i] + '#t=' + seek;
+      vid.dataset.seek = seek;
       vid.preload = 'metadata';
       vid.muted = true;
       vid.playsInline = true;
@@ -410,7 +412,7 @@
     if (e.key === 'ArrowRight') { current = (current + 1) % videos.length; loadLightboxVideo(); }
   });
   document.querySelectorAll('.vid-card video').forEach(v => {
-    v.addEventListener('loadedmetadata', () => { v.currentTime = 0.5; });
+    v.addEventListener('loadedmetadata', () => { v.currentTime = parseFloat(v.dataset.seek || 0.5); });
   });
 </script>
 
