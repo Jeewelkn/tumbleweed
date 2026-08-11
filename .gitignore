@@ -4,3 +4,6 @@
 *.zip
 *.pdf
 Capture*
+
+# Exception : videos du moodboard (doivent etre publiees)
+!video*.mp4
